@@ -66,4 +66,6 @@ public interface Register {
 	
 	void sortRegisterByName();
 
+	void removeAllBy(char firstLetter);
+
 }

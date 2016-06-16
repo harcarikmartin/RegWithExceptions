@@ -12,6 +12,10 @@ public class Main {
         Register register = new ListRegister(20);
 
         register.addPerson(new Person("Janko Hrasko", "0900123456"));
+        register.addPerson(new Person("Danko Hrasko", "09123456"));
+        register.addPerson(new Person("Kajko Hrasko", "09001256"));
+        register.addPerson(new Person("Lukas Hrasko", "0900126"));
+        register.addPerson(new Person("Dezko Hrasko", "000123456"));
 
         ConsoleUI ui = new ConsoleUI(register);
         

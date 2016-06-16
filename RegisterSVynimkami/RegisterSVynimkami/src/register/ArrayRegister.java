@@ -147,4 +147,10 @@ public class ArrayRegister implements Register {
 		
 	}
 
+	@Override
+	public void removeAllBy(char firstLetter) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

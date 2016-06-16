@@ -25,7 +25,7 @@ public class ConsoleUI {
 	 * Menu options.
 	 */
 	private enum Option {
-		PRINT, ADD, UPDATE, REMOVE, FIND, EXIT
+		PRINT, ADD, UPDATE, REMOVE, REMOVE_BY_FIRST_LETTER,FIND, EXIT
 	};
 
 	/**
@@ -60,10 +60,26 @@ public class ConsoleUI {
 			case FIND:
 				findInRegister();
 				break;
+			case REMOVE_BY_FIRST_LETTER:
+				removeByFirstLetter();
+				break;
 			case EXIT:
 				return;
+			
 			}
 		}
+	}
+
+	private void removeByFirstLetter() {
+		System.out.println("Enter first character: ");
+		String letter = readLine();
+		char[] characterArray = new char[1];
+		char character;
+		letter.getChars(0, 1, characterArray, 0);
+		character = characterArray[0];
+		
+		register.removeAllBy(character);
+		
 	}
 
 	/**

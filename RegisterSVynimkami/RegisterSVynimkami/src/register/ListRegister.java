@@ -52,7 +52,7 @@ public class ListRegister implements Register {
 		Iterator<Person> i = persons.iterator(); //ziskam objekt iteratora
 		while(i.hasNext()) { //zisti ci existuje nasledujuca polozka
 			Person p = i.next(); //vrati nasledujucu polozku
-			if (p.getName().contains(name)) {
+			if (p.getName().toLowerCase().contains(name)) {
 				return p;		
 			}
 			//removal example
@@ -61,7 +61,7 @@ public class ListRegister implements Register {
 		
 		//--------traverse using the "enhanced for" loop--------
 		for(Person p : persons) {
-			if (p.getName().contains(name)) {
+			if (p.getName().toLowerCase().contains(name)) {
 				return p;
 			}
 			//removal example
@@ -89,5 +89,24 @@ public class ListRegister implements Register {
 	public void sortRegisterByName() {
 		Collections.sort(persons);
 	}
+
+	@Override
+	public void removeAllBy(char firstLetter) {
+		
+		for(Person p : persons) {
+			if(p.getName().charAt(0) == firstLetter) {
+				System.out.println("Mazem " + p);
+			}
+		}
+		
+		for (int i = persons.size() - 1; i > -1; i--) {
+			if(persons.get(i).getName().charAt(0) == firstLetter) {
+				removePerson(persons.get(i));
+			}
+		}
+		
+	}
+	
+	
 
 }
