@@ -1,5 +1,7 @@
 package register;
 
+import java.io.IOException;
+
 import register.exception.BadIndexException;
 import register.exception.DuplicationException;
 
@@ -149,6 +151,18 @@ public class ArrayRegister implements Register {
 
 	@Override
 	public void removeAllBy(char firstLetter) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void load(String file) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void save(String file) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}

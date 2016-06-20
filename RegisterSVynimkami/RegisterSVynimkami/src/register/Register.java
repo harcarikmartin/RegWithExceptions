@@ -1,7 +1,13 @@
 package register;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import register.exception.BadIndexException;
 import register.exception.DuplicationException;
+import register.exception.ValidationException;
+import register.exception.WrongFormatException;
 
 public interface Register {
 
@@ -67,5 +73,10 @@ public interface Register {
 	void sortRegisterByName();
 
 	void removeAllBy(char firstLetter);
+	
+	void load(String file) throws IOException, ValidationException, WrongFormatException;
+
+	void save(String file) throws IOException;
+	
 
 }

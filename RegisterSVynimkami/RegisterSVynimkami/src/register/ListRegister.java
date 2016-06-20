@@ -1,14 +1,33 @@
 package register;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.omg.CORBA.Any;
+import org.omg.CORBA.Object;
+import org.omg.CORBA.TypeCode;
+import org.omg.CORBA.portable.InputStream;
+
 import register.exception.BadIndexException;
 import register.exception.DuplicationException;
+import register.exception.ValidationException;
+import register.exception.WrongFormatException;
 
-public class ListRegister implements Register {
+public class ListRegister implements Register, Serializable {
 
 	private List<Person> persons;
 
@@ -105,6 +124,37 @@ public class ListRegister implements Register {
 			}
 		}
 		
+	}
+
+	@Override
+	public void save(String file) throws IOException {
+		FileWriter fw = new FileWriter(file);
+		for (Person person : persons) {
+			fw.write(person.getName() + ", " + person.getPhoneNumber() + "\n");
+		}
+		fw.close();
+	}
+
+	@Override
+	public void load(String file) throws IOException, ValidationException, WrongFormatException {
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		String line;
+		
+		
+		while((line = br.readLine()) != null) {
+			StringBuilder name = new StringBuilder();
+			StringBuilder number = new StringBuilder();
+			
+			for (int i = 0; i < line.indexOf(','); i++) {
+				name.append(line.charAt(i));
+			}
+			for (int i = (line.indexOf(',') + 2); i < line.length(); i++) {
+				number.append(line.charAt(i));
+			}
+			Person person = new Person(name.toString(), number.toString());
+			persons.add(person);
+		}
+		br.close();
 	}
 	
 	
