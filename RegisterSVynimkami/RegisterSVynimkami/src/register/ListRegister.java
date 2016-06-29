@@ -1,26 +1,14 @@
 package register;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import org.omg.CORBA.Any;
-import org.omg.CORBA.Object;
-import org.omg.CORBA.TypeCode;
-import org.omg.CORBA.portable.InputStream;
 
 import register.exception.BadIndexException;
 import register.exception.DuplicationException;
@@ -122,8 +110,7 @@ public class ListRegister implements Register, Serializable {
 			if(persons.get(i).getName().charAt(0) == firstLetter) {
 				removePerson(persons.get(i));
 			}
-		}
-		
+		}	
 	}
 
 	@Override
@@ -156,7 +143,4 @@ public class ListRegister implements Register, Serializable {
 		}
 		br.close();
 	}
-	
-	
-
 }
