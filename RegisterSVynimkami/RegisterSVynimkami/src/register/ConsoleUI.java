@@ -25,7 +25,7 @@ public class ConsoleUI {
 	 * Menu options.
 	 */
 	private enum Option {
-		PRINT, ADD, UPDATE, REMOVE, REMOVE_BY_FIRST_LETTER,FIND, EXIT
+		PRINT, ADD, UPDATE, REMOVE, REMOVE_BY_FIRST_LETTER, FIND, GET_AMOUNT_OF_RECORDS,EXIT
 	};
 
 	/**
@@ -63,11 +63,19 @@ public class ConsoleUI {
 			case REMOVE_BY_FIRST_LETTER:
 				removeByFirstLetter();
 				break;
+			case GET_AMOUNT_OF_RECORDS:
+				getCount();
+				break;
 			case EXIT:
 				return;
 			
 			}
 		}
+	}
+
+	private void getCount() {
+		System.out.println("Database has " + register.getCount() + " records");
+		
 	}
 
 	private void removeByFirstLetter() {
@@ -142,8 +150,10 @@ public class ConsoleUI {
 
 		int registerLength = register.getCount();
 
-		if (registerLength > 0)
+		if (registerLength > 0) 
 			System.out.println("Index Name (Phone Number)");
+		else
+			System.out.println("Database is empty");
 		System.out.println("-----------------------------------------------");
 
 		int i = 0;
