@@ -67,15 +67,10 @@ public class ConsoleUI {
 				getCount();
 				break;
 			case EXIT:
-				exit();
 				return;
 			
 			}
 		}
-	}
-	
-	private void exit() {
-		register.exit();
 	}
 	
 	private void getCount() {
