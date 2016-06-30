@@ -67,12 +67,17 @@ public class ConsoleUI {
 				getCount();
 				break;
 			case EXIT:
+				exit();
 				return;
 			
 			}
 		}
 	}
-
+	
+	private void exit() {
+		register.exit();
+	}
+	
 	private void getCount() {
 		if(register.getCount() == 1) {
 			System.out.println("Database has " + register.getCount() + " record");

@@ -1,8 +1,6 @@
 package register;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import register.exception.BadIndexException;
 import register.exception.DuplicationException;
@@ -77,6 +75,8 @@ public interface Register {
 	void load(String file) throws IOException, ValidationException, WrongFormatException;
 
 	void save(String file) throws IOException;
+	
+	public void exit();
 	
 
 }

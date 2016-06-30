@@ -167,4 +167,10 @@ public class ArrayRegister implements Register {
 		
 	}
 
+	@Override
+	public void exit() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

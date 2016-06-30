@@ -12,16 +12,16 @@ import register.exception.BadIndexException;
 import register.exception.ValidationException;
 import register.exception.WrongFormatException;
 
-public class DatabaseRegister implements Register{
+public class DatabaseRegister implements Register {
 	private static final String DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";
 //	private static final String URL = "jdbc:derby:/Users/martinharcarik/DerbyEmbeddedDB";
 //	private static final String USER = "Martin";
 //	private static final String PASSWORD = "Martin";
-	
 	private static final String URL = "jdbc:derby:C:\\Users\\Študent\\DerbyDB";
 	private static final String USER = "SA";
 	private static final String PASSWORD = "SA";
-    private static Connection c = null;
+    
+	private static Connection c = null;
     
     public static final String DROP_QUERY = "DROP TABLE register"; 
     public static final String CREATE_QUERY = 
@@ -32,17 +32,20 @@ public class DatabaseRegister implements Register{
     public static final String FIND_BY_NAME_QUERY = "";
     public static final String FIND_BY_NUMBER_QUERY = "";
     
-//    public DatabaseRegister() {
-//    	try {
-//			Class.forName(DRIVER_CLASS);
-//			c = DriverManager.getConnection(URL, USER, PASSWORD);
-//			PreparedStatement stmt = c.prepareStatement(DROP_QUERY);
-//			stmt.executeUpdate();
-//			stmt.close();
-//		} catch (ClassNotFoundException | SQLException e) {
-//			e.printStackTrace();
-//		}
-//    }
+    public DatabaseRegister(boolean drop) {
+    	if(drop) {
+    		try {
+    			Class.forName(DRIVER_CLASS);
+    			c = DriverManager.getConnection(URL, USER, PASSWORD);
+    			PreparedStatement stmt = c.prepareStatement(DROP_QUERY);
+    			stmt.executeUpdate();
+    			stmt.close();
+    		} catch (ClassNotFoundException | SQLException e) {
+    			e.printStackTrace();
+    		}
+    	}
+    }
+    
     public DatabaseRegister() {
 		try {
 			Class.forName(DRIVER_CLASS);
@@ -85,7 +88,6 @@ public class DatabaseRegister implements Register{
 	        if(rs.next()) {
 			count = rs.getInt(1);
 	        }
-	        rs.close();
 	        stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -105,7 +107,6 @@ public class DatabaseRegister implements Register{
 			if(rs.next()) {
 	        p = new Person(rs.getString(1), rs.getString(2));
 			}
-	        rs.close();
 	        stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -128,7 +129,6 @@ public class DatabaseRegister implements Register{
 			if(rs.next()) {
 		        p = new Person(rs.getString(1), rs.getString(2));
 				}
-		        rs.close();
 		        stmt.close();
 			}
 			else if(number != null) {
@@ -137,7 +137,6 @@ public class DatabaseRegister implements Register{
 				if(rs.next()) {
 			        p = new Person(rs.getString(1), rs.getString(2));
 					}
-			        rs.close();
 			        stmt.close();
 			}
 		} catch (SQLException e) {
@@ -148,6 +147,15 @@ public class DatabaseRegister implements Register{
 			e.printStackTrace();
 		}
 		return p;
+	}
+	
+	@Override
+	public void exit() {
+		try {
+			c.close();
+		} catch (SQLException e) {
+			System.out.println("Could not close the connection ");
+		}
 	}
 	
 	@Override
