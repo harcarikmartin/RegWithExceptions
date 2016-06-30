@@ -13,13 +13,12 @@ import register.exception.ValidationException;
 import register.exception.WrongFormatException;
 
 public class DatabaseRegister implements Register {
-	private static final String DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";
 //	private static final String URL = "jdbc:derby:/Users/martinharcarik/DerbyEmbeddedDB";
 //	private static final String USER = "Martin";
 //	private static final String PASSWORD = "Martin";
-	private static final String URL = "jdbc:derby:C:\\Users\\Študent\\DerbyDB";
-	private static final String USER = "SA";
-	private static final String PASSWORD = "SA";
+	private static final String URL = "jdbc:oracle:thin:@localhost:1521/XE";
+	private static final String USER = "Register";
+	private static final String PASSWORD = "Register";
     
 	private static Connection c = null;
     
@@ -35,12 +34,11 @@ public class DatabaseRegister implements Register {
     public DatabaseRegister(boolean drop) {
     	if(drop) {
     		try {
-    			Class.forName(DRIVER_CLASS);
     			c = DriverManager.getConnection(URL, USER, PASSWORD);
     			PreparedStatement stmt = c.prepareStatement(DROP_QUERY);
     			stmt.executeUpdate();
     			stmt.close();
-    		} catch (ClassNotFoundException | SQLException e) {
+    		} catch (SQLException e) {
     			e.printStackTrace();
     		}
     	}
@@ -48,7 +46,6 @@ public class DatabaseRegister implements Register {
     
     public DatabaseRegister() {
 		try {
-			Class.forName(DRIVER_CLASS);
 			c = DriverManager.getConnection(URL, USER, PASSWORD);
 			try {
 				PreparedStatement stmt = c.prepareStatement(CREATE_QUERY);
@@ -59,7 +56,7 @@ public class DatabaseRegister implements Register {
 				System.out.println("DB Already Exists, use it");
 			}
 			
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
