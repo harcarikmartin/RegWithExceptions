@@ -144,9 +144,4 @@ public class ListRegister implements Register, Serializable {
 		br.close();
 	}
 
-	@Override
-	public void exit() {
-		// TODO Auto-generated method stub
-		
-	}
 }

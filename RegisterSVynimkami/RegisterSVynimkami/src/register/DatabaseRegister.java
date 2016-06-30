@@ -5,8 +5,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import register.exception.BadIndexException;
 import register.exception.ValidationException;
@@ -20,149 +21,101 @@ public class DatabaseRegister implements Register {
 	private static final String USER = "Register";
 	private static final String PASSWORD = "Register";
     
-	private static Connection c = null;
-    
     public static final String DROP_QUERY = "DROP TABLE register"; 
     public static final String CREATE_QUERY = 
-    		"CREATE TABLE register (id INT PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
-    		+ "name VARCHAR(60) NOT NULL, phone_number VARCHAR(20) NOT NULL)";
-    public static final String ADD_QUERY = "INSERT INTO register (name, phone_number) VALUES (?, ?)";
+    		"CREATE TABLE register (id INT PRIMARY KEY, name VARCHAR2(60) NOT NULL, phone_number VARCHAR2(20) NOT NULL)";
+    public static final String SELECT_CONTACTS_QUERY = "SELECT name, phone_number FROM register";
+    public static final String SELECT_CONTACTS_QUERY_BY_NAME = "SELECT name, phone_number FROM register where name = ?";
+    public static final String SELECT_CONTACTS_QUERY_BY_PHONE = "SELECT name, phone_number FROM register where phone_number = ?";
+    public static final String ADD_QUERY = "INSERT INTO register (id, name, phone_number) VALUES (ids.nextval, ?, ?)";
     public static final String GET_COUNT_QUERY = "SELECT COUNT(*) FROM register";
-    public static final String FIND_BY_NAME_QUERY = "";
-    public static final String FIND_BY_NUMBER_QUERY = "";
     
-    public DatabaseRegister(boolean drop) {
-    	if(drop) {
-    		try {
-    			c = DriverManager.getConnection(URL, USER, PASSWORD);
-    			PreparedStatement stmt = c.prepareStatement(DROP_QUERY);
-    			stmt.executeUpdate();
-    			stmt.close();
-    		} catch (SQLException e) {
-    			e.printStackTrace();
-    		}
-    	}
-    }
-    
-    public DatabaseRegister() {
-		try {
-			c = DriverManager.getConnection(URL, USER, PASSWORD);
-			try {
-				PreparedStatement stmt = c.prepareStatement(CREATE_QUERY);
-				stmt.executeUpdate();
-				stmt.close();
-			}
-			catch (Exception e){
-				System.out.println("DB Already Exists, use it");
-			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
+    public DatabaseRegister(){
+		try (Connection c = DriverManager.getConnection(URL, USER, PASSWORD)) {
+			System.out.println("DB connected");
+		}
+		catch (Exception e){
+			throw new RegisterException("Error: creating table", e);
 		}
 	}
 	
 	@Override
-	public void addPerson(Person person) {
-		PreparedStatement stmt;
-		try {
-			stmt = c.prepareStatement(ADD_QUERY);
-			stmt.setString(1, person.getName());
-	        stmt.setString(2, person.getPhoneNumber());
-	        stmt.executeUpdate();
-	        stmt.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+	public void addPerson(Person person){
+		try (Connection c = DriverManager.getConnection(URL, USER, PASSWORD);
+				PreparedStatement stmt = c.prepareStatement(ADD_QUERY)) {
+				stmt.setString(1, person.getName());
+				stmt.setString(2, person.getPhoneNumber());
+				stmt.executeUpdate();
+		}
+		catch (Exception e){
+			throw new RegisterException("Error: adding person", e);
 		}
 	}
 	
 	@Override
 	public int getCount() {
-		int count = 0;
-		Statement stmt;
-		try {
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery(GET_COUNT_QUERY);
-	        if(rs.next()) {
-			count = rs.getInt(1);
-	        }
-	        stmt.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		try (Connection c = DriverManager.getConnection(URL, USER, PASSWORD);
+				Statement stmt = c.createStatement()) {
+			try (ResultSet rs = stmt.executeQuery(GET_COUNT_QUERY)) {
+				if(rs.next()) {
+					return rs.getInt(1);
+				}
+				else {
+					return 0;
+				}
+			}
 		}
-		return count;
+		catch (Exception e){
+			throw new RegisterException("Error: get count", e);
+		}
+	}
+	
+	public List<Person> getPersons() {
+		List<Person> persons = new ArrayList<>();
+		try (Connection c = DriverManager.getConnection(URL, USER, PASSWORD);
+				Statement stmt = c.createStatement()) {
+				ResultSet rs = stmt.executeQuery(SELECT_CONTACTS_QUERY);
+				while(rs.next()) {
+					persons.add(new Person(rs.getString(1), rs.getString(2)));
+				}
+				return persons;
+		}
+		catch (Exception e){
+			throw new RegisterException("Error: get persons", e);
+		}
 	}
 	
 	@Override
 	public Person getPerson(int index) throws BadIndexException {
-		Person p = null;
-		Statement stmt;
-		try {
-			stmt = c.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT name, phone_number FROM register "
-					+ "ORDER BY name, phone_number OFFSET "+Integer.toString(index)+ " ROWS "
-							+ "FETCH NEXT 1 ROWS ONLY");
-			if(rs.next()) {
-	        p = new Person(rs.getString(1), rs.getString(2));
-			}
-	        stmt.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ValidationException e) {
-			e.printStackTrace();
-		} catch (WrongFormatException e) {
-			e.printStackTrace();
-		}
-		return p;
+		return getPersons().get(index);
 	}
 	
-	public Person find(String name, String number) {
-		Person p = null;
-		Statement stmt;
-		try {
-			stmt = c.createStatement();
-			if(name != null) {
-			ResultSet rs = stmt.executeQuery("SELECT name, phone_number FROM register "
-					+ "WHERE name = '"+name+"'");
-			if(rs.next()) {
-		        p = new Person(rs.getString(1), rs.getString(2));
-				}
-		        stmt.close();
-			}
-			else if(number != null) {
-				ResultSet rs = stmt.executeQuery("SELECT name, phone_number FROM register "
-						+ "WHERE phone_number = '"+number+"'");
-				if(rs.next()) {
-			        p = new Person(rs.getString(1), rs.getString(2));
+	private Person find(String parameter, String query) {
+		try (Connection c = DriverManager.getConnection(URL, USER, PASSWORD);
+				PreparedStatement stmt = c.prepareStatement(query)) {
+				stmt.setString(1, parameter);
+				try (ResultSet rs = stmt.executeQuery()) {
+					if(rs.next()) {
+						return new Person(rs.getString(1), rs.getString(2));
 					}
-			        stmt.close();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (ValidationException e) {
-			e.printStackTrace();
-		} catch (WrongFormatException e) {
-			e.printStackTrace();
+					else {
+						return null;
+					}
+				}
 		}
-		return p;
-	}
-	
-	@Override
-	public void exit() {
-		try {
-			c.close();
-		} catch (SQLException e) {
-			System.out.println("Could not close the connection ");
+		catch (Exception e){
+			throw new RegisterException("Error: select person by one parameter", e);
 		}
 	}
 	
 	@Override
 	public Person findPersonByName(String name) {
-		return find(name, null);
+		return find(name, SELECT_CONTACTS_QUERY_BY_NAME);
 	}
 
 	@Override
 	public Person findPersonByPhoneNumber(String phoneNumber) {
-		return find(null, phoneNumber);
+		return find(phoneNumber, SELECT_CONTACTS_QUERY_BY_PHONE);
 	}
 
 	@Override

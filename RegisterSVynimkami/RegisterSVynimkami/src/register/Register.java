@@ -75,8 +75,5 @@ public interface Register {
 	void load(String file) throws IOException, ValidationException, WrongFormatException;
 
 	void save(String file) throws IOException;
-	
-	public void exit();
-	
 
 }
